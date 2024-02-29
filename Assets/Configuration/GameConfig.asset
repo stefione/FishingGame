@@ -1,0 +1,197 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: abbba85174488ab4db2d9f4166499bc2, type: 3}
+  m_Name: GameConfig
+  m_EditorClassIdentifier: 
+  serializationData:
+    SerializedFormat: 2
+    SerializedBytes: 
+    ReferencedUnityObjects:
+    - {fileID: 4098420543794126136, guid: 3abb56754ca7eab4da068fc8b0165255, type: 3}
+    - {fileID: 4098420543794126136, guid: be4e922ad412f5b4ca9a59b85526a833, type: 3}
+    - {fileID: 4098420543794126136, guid: 889ac650ec401a747b1f5156e8b546df, type: 3}
+    SerializedBytesString: 
+    Prefab: {fileID: 0}
+    PrefabModificationsReferencedUnityObjects: []
+    PrefabModifications: []
+    SerializationNodes:
+    - Name: FishDatas
+      Entry: 7
+      Data: 0|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[PixPlays.Fishing.Entities.FishData,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 1|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: sample-fish-1
+    - Name: $v
+      Entry: 7
+      Data: 2|PixPlays.Fishing.Entities.FishData, Assembly-CSharp
+    - Name: Id
+      Entry: 1
+      Data: sample-fish-1
+    - Name: Name
+      Entry: 1
+      Data: Sample Fish 1
+    - Name: Rarity
+      Entry: 3
+      Data: 0
+    - Name: CatchChance
+      Entry: 4
+      Data: 70
+    - Name: SpawnChance
+      Entry: 4
+      Data: 70
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: sample-fish-2
+    - Name: $v
+      Entry: 7
+      Data: 3|PixPlays.Fishing.Entities.FishData, Assembly-CSharp
+    - Name: Id
+      Entry: 1
+      Data: sample-fish-2
+    - Name: Name
+      Entry: 1
+      Data: Sample Fish 2
+    - Name: Rarity
+      Entry: 3
+      Data: 1
+    - Name: CatchChance
+      Entry: 4
+      Data: 50
+    - Name: SpawnChance
+      Entry: 4
+      Data: 50
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: sample-fish-3
+    - Name: $v
+      Entry: 7
+      Data: 4|PixPlays.Fishing.Entities.FishData, Assembly-CSharp
+    - Name: Id
+      Entry: 1
+      Data: sample-fish-3
+    - Name: Name
+      Entry: 1
+      Data: Sample Fish 3
+    - Name: Rarity
+      Entry: 3
+      Data: 2
+    - Name: CatchChance
+      Entry: 4
+      Data: 30
+    - Name: SpawnChance
+      Entry: 4
+      Data: 20
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: FishTemplates
+      Entry: 7
+      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[PixPlays.Fishing.Entities.FishController,
+        Assembly-CSharp]], mscorlib
+    - Name: comparer
+      Entry: 7
+      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: sample-fish-1
+    - Name: $v
+      Entry: 10
+      Data: 0
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: sample-fish-2
+    - Name: $v
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: sample-fish-3
+    - Name: $v
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+  SampleAttempts: 10
+  SuccessChance: 100
+  NumberOfFish: 5
+  PlayerTemplate: {fileID: 1576600913131663510, guid: e6357aa6615bc0540b4c1aa79d371050,
+    type: 3}
