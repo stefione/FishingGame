@@ -4,14 +4,15 @@ using PixPlays.Fishing.Player;
 using PixPlays.Fishing.World;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 
-public class BaseGameManager : MonoBehaviour
+public class BaseGameManager : NetworkBehaviour
 {
-    public GameSceneData GameSceneData;
-    public GameConfiguration GameConfig;
-    public WaterArea WaterArea;
-
     protected List<FishController> fishes = new();
-    public Dictionary<string, PlayerData> PlayerDatas = new();
+    public GameConfiguration GameConfig;
+
+
+    public Dictionary<ulong, PlayerData> PlayerDatas = new();
+    protected Dictionary<ulong, ClientPlayerController> PlayerControllers = new();
 }

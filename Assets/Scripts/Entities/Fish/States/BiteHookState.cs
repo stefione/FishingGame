@@ -9,10 +9,10 @@ namespace PixPlays.Fishing.States
     public class BiteHookState : EntityState
     {
         private MovementController _movementController;
-        private FishController _fishController;
+        private BaseFishController _fishController;
         private Action _onFinish;
         private bool _hookBitten;
-        public BiteHookState(MovementController movementController, FishController fishController,Action onFinish)
+        public BiteHookState(MovementController movementController, BaseFishController fishController,Action onFinish)
         {
             _hookBitten = false;
             _fishController = fishController;

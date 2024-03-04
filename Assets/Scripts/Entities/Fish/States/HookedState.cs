@@ -7,10 +7,10 @@ namespace PixPlays.Fishing.States
 {
     public class HookedState : EntityState
     {
-        private FishController _fishController;
+        private BaseFishController _fishController;
         private MovementController _movementController;
         private float _lerp = 0;
-        public HookedState(FishController fishController, MovementController movementController)
+        public HookedState(BaseFishController fishController, MovementController movementController)
         {
             _fishController = fishController;
             _movementController = movementController;

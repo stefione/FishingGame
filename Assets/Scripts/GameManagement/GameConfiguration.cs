@@ -1,4 +1,5 @@
 using PixPlays.Fishing.Entities;
+using PixPlays.Fishing.GameManagement;
 using PixPlays.Fishing.Hook;
 using PixPlays.Fishing.Player;
 using Sirenix.OdinInspector;
@@ -16,6 +17,11 @@ namespace PixPlays.Fishing.Configuration
         public Dictionary<string,FishData> FishDatas;
         public Dictionary<string, FishController> FishTemplates;
         public int NumberOfFish;
+
+        public ClientGameManager ClientGameManagerTemplate;
+        public ServerGameManager ServerGameManagerTemplate;
+
         public ClientPlayerController PlayerTemplate;
+        public ServerPlayerController ServerPlayerTemplate;
     }
 }

@@ -10,6 +10,10 @@ namespace PixPlays.Fishing.RandomGenerator
         {
             int totalAttempts = 0;
             int successCount = 0;
+            if (attempts == null)
+            {
+                attempts = new();
+            }
             int lastAttemptsCount = attempts.Count % sampleAttempts;
             for (int i = attempts.Count - 1; i >= attempts.Count - lastAttemptsCount; i--)
             {

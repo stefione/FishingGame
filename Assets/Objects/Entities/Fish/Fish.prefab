@@ -11,7 +11,8 @@ GameObject:
   - component: {fileID: 7425082196528319608}
   - component: {fileID: 853060427832843959}
   - component: {fileID: 4817081017874638726}
-  - component: {fileID: 4098420543794126136}
+  - component: {fileID: 7181952672405927896}
+  - component: {fileID: 73555796091816148}
   m_Layer: 0
   m_Name: Fish
   m_TagString: Untagged
@@ -70,7 +71,27 @@ MonoBehaviour:
   RotationSpeed: 0.02
   _AncorObject: {fileID: 8896046392739061296}
   _ErrorDistance: 0.5
---- !u!114 &4098420543794126136
+--- !u!114 &7181952672405927896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3383524476318285845}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 2054343303
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!114 &73555796091816148
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -82,7 +103,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9b380b1b64c395478dd5d215579cd2e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  NetworkId: 0
   Owner: {fileID: 0}
+  _SyncLerpSpeed: 10
 --- !u!1 &5924044190694411482
 GameObject:
   m_ObjectHideFlags: 0

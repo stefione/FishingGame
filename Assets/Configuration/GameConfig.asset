@@ -16,7 +16,7 @@ MonoBehaviour:
     SerializedFormat: 2
     SerializedBytes: 
     ReferencedUnityObjects:
-    - {fileID: 4098420543794126136, guid: 3abb56754ca7eab4da068fc8b0165255, type: 3}
+    - {fileID: -2617440822625465282, guid: aa77c4b91bda92244b0bce08be70363b, type: 3}
     - {fileID: 4098420543794126136, guid: be4e922ad412f5b4ca9a59b85526a833, type: 3}
     - {fileID: 4098420543794126136, guid: 889ac650ec401a747b1f5156e8b546df, type: 3}
     SerializedBytesString: 
@@ -37,7 +37,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 1
     - Name: 
       Entry: 7
       Data: 
@@ -69,66 +69,6 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: sample-fish-2
-    - Name: $v
-      Entry: 7
-      Data: 3|PixPlays.Fishing.Entities.FishData, Assembly-CSharp
-    - Name: Id
-      Entry: 1
-      Data: sample-fish-2
-    - Name: Name
-      Entry: 1
-      Data: Sample Fish 2
-    - Name: Rarity
-      Entry: 3
-      Data: 1
-    - Name: CatchChance
-      Entry: 4
-      Data: 50
-    - Name: SpawnChance
-      Entry: 4
-      Data: 50
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: sample-fish-3
-    - Name: $v
-      Entry: 7
-      Data: 4|PixPlays.Fishing.Entities.FishData, Assembly-CSharp
-    - Name: Id
-      Entry: 1
-      Data: sample-fish-3
-    - Name: Name
-      Entry: 1
-      Data: Sample Fish 3
-    - Name: Rarity
-      Entry: 3
-      Data: 2
-    - Name: CatchChance
-      Entry: 4
-      Data: 30
-    - Name: SpawnChance
-      Entry: 4
-      Data: 20
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -136,11 +76,11 @@ MonoBehaviour:
       Data: 
     - Name: FishTemplates
       Entry: 7
-      Data: 5|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[PixPlays.Fishing.Entities.FishController,
+      Data: 3|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[PixPlays.Fishing.Entities.FishController,
         Assembly-CSharp]], mscorlib
     - Name: comparer
       Entry: 7
-      Data: 6|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+      Data: 4|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
         mscorlib]], mscorlib
     - Name: 
       Entry: 8
@@ -193,5 +133,10 @@ MonoBehaviour:
   SampleAttempts: 10
   SuccessChance: 100
   NumberOfFish: 5
-  PlayerTemplate: {fileID: 1576600913131663510, guid: e6357aa6615bc0540b4c1aa79d371050,
+  ClientGameManagerTemplate: {fileID: 4219461655441663585, guid: 7ba5ba44101af2642bf6dfff66418e83,
     type: 3}
+  ServerGameManagerTemplate: {fileID: -7916735795354619133, guid: ea4976f98e353324fa74d2f6cedd5e42,
+    type: 3}
+  PlayerTemplate: {fileID: 1250591217806114698, guid: e6357aa6615bc0540b4c1aa79d371050,
+    type: 3}
+  ServerPlayerTemplate: {fileID: 0}

@@ -9,6 +9,7 @@ namespace PixPlays.Fishing.Movement
         public float MovementSpeed;
         public float RotationSpeed;
         public event Action<Vector3,Vector3> OnDestinationReached;
+        public event Action<Vector3, float> OnNewDestinationSet;
         public Vector3 Destination { get; protected set; }
 
         public abstract void Teleport(Vector3 location);
@@ -21,7 +22,9 @@ namespace PixPlays.Fishing.Movement
             {
                 MoveToImplementation();
                 _isMoving = true;
+
             }
+            OnNewDestinationSet?.Invoke(Destination,MovementSpeed);
         }
 
         protected abstract void MoveToImplementation();

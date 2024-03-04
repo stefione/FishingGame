@@ -1,27 +1,48 @@
 using PixPlays.Fishing.Entities;
+using PixPlays.Fishing.GameManagement;
 using PixPlays.Fishing.Hook;
 using PixPlays.Fishing.World;
 using PixPlays.Framework.Events;
+using PixPlays.Framework.Network;
 using System;
 using System.Collections;
+using Unity.Collections;
+using Unity.Netcode;
 using UnityEngine;
 namespace PixPlays.Fishing.Player
 {
     public class TryCatchFishEvent
     {
-        public string PlayerID;
+        public ulong PlayerID;
+    }
+    public class PlayerControllerSpawnedEvent
+    {
+        public ClientPlayerController Controller;
+    }
+    public class ThrowHookEvent
+    {
+        public ulong PlayerID;
     }
 
     public class ClientPlayerController : BasePlayerController
     {
+        private ulong _playerClientId;
         public HookController Hook;
-        private FishController _caughtFish;
+        private BaseFishController _caughtFish;
         private bool _canThrow=true;
         private void Awake()
         {
             EventManager.Subscribe<LiftHookEvent>(x => ProcessLiftHookEvent(x));
         }
 
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            EventManager.Fire(new PlayerControllerSpawnedEvent()
+            {
+                Controller = this
+            });
+        }
         private void ProcessLiftHookEvent(LiftHookEvent x)
         {
             if (x.Owner == this) 
@@ -30,8 +51,9 @@ namespace PixPlays.Fishing.Player
             }
         }
 
-        public void SetData(PlayerData playerData, WaterArea waterArea)
+        public void SetData(ulong playerClientId ,PlayerData playerData, WaterArea waterArea)
         {
+            _playerClientId = playerClientId;
             _playerData = playerData;
             Hook.SetData(waterArea);
             Hook.OnHookReachedMaxDepth += _hook_OnHookReachedMaxDepth;
@@ -51,25 +73,25 @@ namespace PixPlays.Fishing.Player
         {
             EventManager.Fire(new TryCatchFishEvent()
             {
-                PlayerID = _playerData.Id
+                PlayerID = _playerClientId
             });
         }
 
         public void Update()
         {
-            if (_canThrow && Input.GetKeyDown(KeyCode.Space))
+            if (IsOwner && _canThrow && Input.GetKeyDown(KeyCode.Space))
             {
-                ThrowHook();
+                EventManager.Fire(new ThrowHookEvent() { PlayerID = OwnerClientId });
             }
         }
 
-        private void ThrowHook()
+        public void ThrowHook()
         {
             Hook.ThrowHook();
             _canThrow = false;
         }
 
-        internal void LiftHook(FishController fish)
+        internal void LiftHook(BaseFishController fish)
         {
             _caughtFish= fish;
             Hook.LiftHook();

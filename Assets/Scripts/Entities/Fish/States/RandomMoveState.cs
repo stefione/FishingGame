@@ -1,3 +1,4 @@
+using PixPlays.Fishing.Entities;
 using PixPlays.Fishing.Movement;
 using PixPlays.Fishing.World;
 using System;
@@ -9,11 +10,13 @@ namespace PixPlays.Fishing.States
 {
     public class RandomMoveState : EntityState
     {
+        private FishController _fishController;
         private MovementController _movementController;
         private WaterArea _waterArea;
 
-        public RandomMoveState(MovementController movementController, WaterArea waterArea)
+        public RandomMoveState(FishController fishController,MovementController movementController, WaterArea waterArea)
         {
+            _fishController = fishController;
             _movementController = movementController;
             _waterArea = waterArea;
         }

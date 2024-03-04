@@ -2,12 +2,14 @@ using PixPlays.Fishing.World;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Netcode;
 using UnityEngine;
 using Random = UnityEngine.Random;
 namespace PixPlays.Fishing.Hook
 {
-    public class HookController : MonoBehaviour
+    public class HookController : NetworkBehaviour
     {
+        //private NetworkVariable<Vector3> m_SomeValue = new NetworkVariable<Vector3>();
         [SerializeField] Transform _HookSource;
         [SerializeField] Transform _HookTransform;
         [SerializeField] LineRenderer _Line;
@@ -26,23 +28,41 @@ namespace PixPlays.Fishing.Hook
             _waterArea= waterArea;
         }
 
+        //private void Update()
+        //{
+        //    if (IsOwner)
+        //    {
+        //        m_SomeValue.Value = _HookTransform.position;
+        //    }
+        //    else
+        //    {
+        //        _HookTransform.position = Vector3.Lerp(_HookTransform.position, m_SomeValue.Value,Time.deltaTime*3);
+        //    }
+        //}
+
         public void ThrowHook()
         {
-            StopAllCoroutines();
-            StartCoroutine(Coroutine_ThrowHook());
+            //if (IsOwner)
+            //{
+                StopAllCoroutines();
+                StartCoroutine(Coroutine_ThrowHook());
+            //}
         }
 
         public void LiftHook()
         {
-            StopAllCoroutines();
-            StartCoroutine(Coroutine_LiftHook());
+            //if (IsOwner)
+            //{
+                StopAllCoroutines();
+                StartCoroutine(Coroutine_LiftHook());
+            //}
         }
 
         IEnumerator Coroutine_ThrowHook()
         {
             Vector3 startPos = _HookTransform.position;
             float waterRange = _waterArea.TopRight.position.y - _waterArea.BottomLeft.position.y;
-            float hookHeight = _waterArea.BottomLeft.position.y + waterRange * Random.Range(0.1f, 0.4f);
+            float hookHeight = _waterArea.BottomLeft.position.y + waterRange * 0.2f;
             Vector3 endPos = _HookTransform.position;
             endPos.y = hookHeight;
             float lerp = 0;
