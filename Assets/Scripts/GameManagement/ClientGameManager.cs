@@ -1,8 +1,8 @@
 using PixPlays.Fishing.Configuration;
-using PixPlays.Fishing.Entities;
-using PixPlays.Fishing.Hook;
+using PixPlays.Fishing.Fish;
 using PixPlays.Fishing.Player;
 using PixPlays.Fishing.RandomGenerator;
+using PixPlays.Fishing.UI;
 using PixPlays.Fishing.World;
 using PixPlays.Framework.Events;
 using PixPlays.Framework.Network;
@@ -20,179 +20,228 @@ using UnityEngine;
 namespace PixPlays.Fishing.GameManagement
 {
 
-
     public class ClientGameManager : BaseGameManager
     {
-        protected Dictionary<ulong, FishController> spawnedFish=new();
+        protected Dictionary<ulong, ClientFishController> spawnedFish = new();
+        protected Dictionary<ulong, ClientPlayerController> PlayerControllers = new();
         public GameSceneData GameSceneData;
-
-        private FishNetworkData? fishNetworkData;
 
         private void Start()
         {
             Application.targetFrameRate = 1000;
-
-            EventManager.Subscribe<PlayerControllerSpawnedEvent>(x => ProcessPlayerControllerSpawnedEvent(x));
             EventManager.Subscribe<ThrowHookEvent>(x => ProcessThrowHookEvent(x));
-            EventManager.Subscribe<FishSpawnEvent>(x => ProcessFishSpawnEvent(x));
-            NetworkManager.OnClientStarted += NetworkManager_OnClientStarted;
-            NetworkManager.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+            EventManager.Subscribe<LiftHookEvent>(x => ProcessLiftHookEvent(x));
+            NetworkManager.Singleton.OnClientStarted += NetworkManager_OnClientStarted;
+            NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
             NetworkManager.Singleton.StartClient();
-        }
-
-        private void ProcessFishSpawnEvent(FishSpawnEvent x)
-        {
-            spawnedFish.Add(x.Fish.NetworkObjectId,x.Fish);
-            if (fishNetworkData != null)
-            {
-                int index = fishNetworkData.Value.NetworkIds.ToList().FindIndex(y => y == x.Fish.NetworkObjectId);
-                if (GameConfig.FishDatas.TryGetValue(fishNetworkData.Value.FishIds[index], out var data)) 
-                {
-                    x.Fish.SetData(data, WorldData.Instance.WaterArea, fishNetworkData.Value.Positions[index]);
-                }
-            }
         }
 
         private void NetworkManager_OnClientStarted()
         {
             NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
-                 GameManagerMessage.PlayerRegisteredMessage.ToString(), (ulong sender, FastBufferReader reader) =>
-                 {
-                     reader.ReadValueSafe(out ulong clientId);
-                     reader.ReadValueSafe(out int spawnIndex);
-                     reader.ReadNetworkSerializable(out PlayerDataStruct data);
-                     ProcessPlayerRegisteredMessage(clientId,spawnIndex,new PlayerData(data));
-                 });
+                GameManagerMessageType.PlayerRegisteredMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                {
+                    reader.ReadValueSafe(out ulong clientId);
+                    reader.ReadValueSafe(out Vector3 position);
+                    reader.ReadValueSafe(out int spawnPointIndex);
+                    reader.ReadNetworkSerializable(out PlayerDataMessage data);
+                    ProcessPlayerRegisteredMessage(clientId, position, new PlayerData(data), spawnPointIndex);
+                });
             NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
-                GameManagerMessage.CatchFishResultMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                GameManagerMessageType.CatchFishResultMessage.ToString(), (ulong sender, FastBufferReader reader) =>
                 {
                     reader.ReadValueSafe(out ulong clientId);
                     reader.ReadValueSafe(out bool attemptResult);
-                    reader.ReadValueSafe(out string fishId);
+                    reader.ReadValueSafe(out ulong fishId);
                     ProcessCatchFishResultMessage(clientId, attemptResult, fishId);
                 });
             NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
-                GameManagerMessage.LiftHookMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                GameManagerMessageType.LiftHookAllMessage.ToString(), (ulong sender, FastBufferReader reader) =>
                 {
                     reader.ReadValueSafe(out ulong clientId);
                     ProcessLiftHookMessage(clientId);
                 });
             NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
-                 GameManagerMessage.ThrowHookAllMessage.ToString(), (ulong sender, FastBufferReader reader) =>
-                 {
-                     reader.ReadValueSafe(out ulong clientId);
-                     ProcessThrowAllHookMessage(clientId);
-                 });
+                GameManagerMessageType.ThrowHookAllMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                {
+                    reader.ReadValueSafe(out ulong clientId);
+                    ProcessThrowAllHookMessage(clientId);
+                });
             NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
-              GameManagerMessage.SpawnEntitiesMessage.ToString(), (ulong sender, FastBufferReader reader) =>
-              {
-                  reader.ReadValueSafe(out FishNetworkData fishData);
-                  ProcessSpawnEntitiesEvent(fishData);
-              });
+                GameManagerMessageType.SpawnFishMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                {
+                    reader.ReadValueSafe(out FishesDataMessage fishData);
+                    ProcessSpawnFishMessage(fishData);
+                });
+            NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
+                GameManagerMessageType.UpdateFishPositionsMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                {
+                    reader.ReadNetworkSerializable(out FishesUpdateMessage fishData);
+                    ProcessUpdateFishPositionMessage(fishData);
+                });
+            NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
+                GameManagerMessageType.PlayersMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                {
+                    reader.ReadNetworkSerializable(out PlayersDataMessage playersNetworkData);
+                    ProcessPlayersMessage(playersNetworkData);
+                });
+            NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
+                GameManagerMessageType.ClientDisconnectedMessage.ToString(), (ulong sender, FastBufferReader reader) =>
+                {
+                    reader.ReadValueSafe(out ulong clientId);
+                    ProcessClientDisconnectedMessage(clientId);
+                });
+            EventManager.Fire(new OnClientStartedEvent());
+        }
+        private void NetworkManager_OnClientConnectedCallback(ulong obj)
+        {
+            SendRegisterPlayerMessage();
         }
 
-        private void ProcessSpawnEntitiesEvent(FishNetworkData fishData)
+
+        private void ProcessThrowHookEvent(ThrowHookEvent x)
         {
-            fishNetworkData = fishData;
-            int count = 0;
-            if (spawnedFish != null)
+            SendThrowHookRequestMessage();
+        }
+        private void ProcessLiftHookEvent(LiftHookEvent x)
+        {
+            if (spawnedFish.TryGetValue(x.FishId, out var fish))
             {
-                foreach (var i in fishData.NetworkIds)
+                if (PlayerControllers.TryGetValue(x.OwnerId, out var controller))
                 {
-                    if (spawnedFish.TryGetValue(i, out var fish))
-                    {
-                        if (GameConfig.FishDatas.TryGetValue(fishNetworkData.Value.FishIds[count], out var data))
-                        {
-                            fish.SetData(data, WorldData.Instance.WaterArea, fishNetworkData.Value.Positions[count]);
-                        }
-                    }
-                    count++;
+                    PlayerControllers[x.OwnerId].LiftHook(fish);
                 }
             }
         }
 
-        private void ProcessPlayerRegisteredMessage(ulong clientId, int spawnIndex, PlayerData playerData)
+
+        private void ProcessPlayersMessage(PlayersDataMessage playersNetworkData)
         {
-            PlayerDatas.Add(clientId, playerData);
-            if(PlayerControllers.TryGetValue(clientId,out var controller))
+            for (int i = 0; i < playersNetworkData.NetworkIds.Length; i++)
             {
-                controller.SetData(clientId, playerData, WorldData.Instance.WaterArea);
+                RegisterPlayer(
+                    playersNetworkData.NetworkIds[i], 
+                    playersNetworkData.Positions[i], 
+                    new PlayerData(playersNetworkData.PlayerDataStructs[i]),
+                    playersNetworkData.SpawnPointIndicies[i]);
             }
         }
-        private void ProcessPlayerControllerSpawnedEvent(PlayerControllerSpawnedEvent x)
+        private void ProcessUpdateFishPositionMessage(FishesUpdateMessage fishData)
         {
-            if (PlayerDatas.TryGetValue(x.Controller.OwnerClientId, out var playerData))
+            for(int i=0;i<fishData.Ids.Length;i++)
             {
-                x.Controller.SetData(x.Controller.OwnerClientId, playerData, WorldData.Instance.WaterArea);
+                if (spawnedFish.TryGetValue(fishData.Ids[i],out var fish))
+                {
+                    fish.UpdatePosition(fishData.Positions[i]);
+                }
             }
-            PlayerControllers.Add(x.Controller.OwnerClientId, x.Controller);
+        }
+        private void ProcessSpawnFishMessage(FishesDataMessage fishReceivedDatas)
+        {
+            for (int i = 0; i < fishReceivedDatas.Positions.Length; i++)
+            {
+                if (GameConfig.FishDatas.TryGetValue(fishReceivedDatas.FishIds[i], out var fishData))
+                {
+                    if (GameConfig.FishTemplates.TryGetValue(fishData.Data.Id, out var fishTemplate))
+                    {
+                        ClientFishController fish = Instantiate(GameConfig.ClientFishController);
+                        fish.SetData(fishReceivedDatas.NetworkIds[i], fishTemplate, fishData.Data, WorldData.Instance.WaterArea, fishReceivedDatas.Positions[i]);
+                        spawnedFish.Add(fishReceivedDatas.NetworkIds[i], fish);
+                    }
+                }
+            }
+        }
+        private void ProcessPlayerRegisteredMessage(ulong clientId, Vector3 position, PlayerData playerData,int spawnPointIndex)
+        {
+            RegisterPlayer(clientId, position, playerData, spawnPointIndex);
         }
 
-        private void NetworkManager_OnClientConnectedCallback(ulong obj)
-        {
-            using (FastBufferWriter writer =new FastBufferWriter(NetworkConstants.MaxPayloadSize, Allocator.Temp))
-            {
-                var data = new PlayerDataStruct(GameSceneData.Players[0]);
-                writer.WriteNetworkSerializable(in data);
-                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(
-                    GameManagerMessage.RegisterPlayerMessage.ToString(),
-                    NetworkManager.ServerClientId,
-                    writer,
-                    NetworkDelivery.ReliableFragmentedSequenced);
-            }
-        }
 
-        private void ProcessThrowHookEvent(ThrowHookEvent x)
-        {
-            using (FastBufferWriter writer = new FastBufferWriter(NetworkConstants.MaxPayloadSize, Allocator.Temp))
-            {
-                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(
-                    GameManagerMessage.ThrowHookMessage.ToString(),
-                    NetworkManager.ServerClientId,
-                    writer,
-                    NetworkDelivery.ReliableFragmentedSequenced);
-            }
-        }
 
-        private void ProcessCatchFishResultMessage(ulong playerId, bool attemptResult, string fishId)
+        private void ProcessCatchFishResultMessage(ulong playerId, bool attemptResult, ulong fishId)
         {
             if (PlayerDatas.TryGetValue(playerId, out var player))
             {
                 if (attemptResult)
                 {
-                    if (player.Attempts == null)
+                    if (spawnedFish.TryGetValue(fishId, out var fish))
                     {
-                        player.Attempts = new();
-                    }
-                    player.Attempts.Add(true);
-                    if (player.FishCought == null)
-                    {
-                        player.FishCought = new();
-                    }
-                    if (player.FishCought.ContainsKey(fishId))
-                    {
-                        player.FishCought[fishId]++;
-                    }
-                    else
-                    {
-                        player.FishCought.Add(fishId, 1);
+                        fish.BiteHook(PlayerControllers[playerId]);
+                        player.UpdateAttempt(true,fish.FishData);
                     }
                 }
                 else
                 {
-                    player.Attempts.Add(false);
+                    player.UpdateAttempt(false,null);
                 }
             }
         }
-
         private void ProcessThrowAllHookMessage(ulong clientId)
         {
-            PlayerControllers[clientId].ThrowHook();
+            PlayerControllers[clientId].StartThrowHook();
         }
-
         private void ProcessLiftHookMessage(ulong clientId)
         {
-            PlayerControllers[clientId].LiftHook(null);
+            if(PlayerControllers.TryGetValue(clientId,out var controller))
+            {
+                controller.LiftHook(null);
+            }
+        }
+        private void ProcessClientDisconnectedMessage(ulong clientId)
+        {
+            if (PlayerControllers.TryGetValue(clientId, out var playerController))
+            {
+                Destroy(playerController.gameObject);
+                PlayerControllers.Remove(clientId);
+            }
+            PlayerDatas.Remove(clientId);
+            EventManager.Fire(new PlayerDisconnectedEvent()
+            {
+                ClientId = clientId
+            });
+        }
+
+
+        private void RegisterPlayer(ulong clientId, Vector3 position, PlayerData playerData,int spawnPointIndex)
+        {
+            PlayerDatas.Add(clientId, playerData);
+            ClientPlayerController clientPlayerController = Instantiate(GameConfig.ClientPlayerTemplate, position, Quaternion.identity);
+            bool isOwner = NetworkManager.Singleton.LocalClientId == clientId;
+            clientPlayerController.SetData(clientId, playerData, WorldData.Instance.WaterArea, isOwner,spawnPointIndex);
+            if (!PlayerControllers.TryAdd(clientId, clientPlayerController))
+            {
+                Debug.LogError("Trying to add controller with same ID");
+            }
+            EventManager.Fire(new PlayerRegisteredEvent()
+            {
+                PlayerData = playerData,
+                ClientId = clientId,
+                SpawnPointIndex=spawnPointIndex
+            });
+        }
+        private static void SendThrowHookRequestMessage()
+        {
+            using (FastBufferWriter writer = new FastBufferWriter(NetworkConstants.MaxPayloadSize, Allocator.Temp))
+            {
+                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(
+                    GameManagerMessageType.ThrowHookRequestMessage.ToString(),
+                    NetworkManager.ServerClientId,
+                    writer,
+                    NetworkDelivery.ReliableFragmentedSequenced);
+            }
+        }
+        private void SendRegisterPlayerMessage()
+        {
+            using (FastBufferWriter writer = new FastBufferWriter(NetworkConstants.MaxPayloadSize, Allocator.Temp))
+            {
+                var data = new PlayerDataMessage(GameSceneData.LocalPlayerData);
+                writer.WriteNetworkSerializable(in data);
+                NetworkManager.Singleton.CustomMessagingManager.SendNamedMessage(
+                    GameManagerMessageType.RegisterPlayerMessage.ToString(),
+                    NetworkManager.ServerClientId,
+                    writer,
+                    NetworkDelivery.ReliableFragmentedSequenced);
+            }
         }
     }
 }

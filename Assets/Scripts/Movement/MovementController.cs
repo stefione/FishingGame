@@ -37,5 +37,7 @@ namespace PixPlays.Fishing.Movement
 
         public abstract Vector3 GetPosition();
         public abstract Vector3 GetForward();
+
+        public abstract void SetForward(Vector3 forward);
     }
 }

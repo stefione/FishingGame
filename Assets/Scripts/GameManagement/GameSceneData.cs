@@ -7,6 +7,6 @@ namespace PixPlays.Fishing.World
     [System.Serializable]
     public class GameSceneData
     {
-        public List<PlayerData> Players;
+        public PlayerData LocalPlayerData;
     }
 }

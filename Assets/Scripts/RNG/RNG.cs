@@ -6,7 +6,7 @@ namespace PixPlays.Fishing.RandomGenerator
 {
     public static class RNG
     {
-        public static bool RTP_WillCatch(List<bool> attempts,int sampleAttempts,float successChance)
+        public static bool GetSuccessAttempt(List<bool> attempts,int sampleAttempts,float successChance)
         {
             int totalAttempts = 0;
             int successCount = 0;
@@ -46,17 +46,17 @@ namespace PixPlays.Fishing.RandomGenerator
             }
         }
 
-        public static string RNG_ItemCought(Dictionary<string, float> items)
+        public static T SelectRandomItem<T>(Dictionary<T, float> items)
         {
             float maxCatchValue = 0;
-            Dictionary<string, Vector2> catchValues = new();
+            Dictionary<T, Vector2> catchValues = new();
             foreach (var i in items)
             {
                 catchValues.Add(i.Key, new Vector2(maxCatchValue, maxCatchValue + i.Value));
                 maxCatchValue += i.Value;
             }
             float catchValue = Random.Range(0, maxCatchValue);
-            string key = null;
+            T key = default;
             foreach (var catchItem in catchValues)
             {
                 if (catchItem.Value.x < catchValue && catchItem.Value.y >= catchValue)
@@ -66,6 +66,31 @@ namespace PixPlays.Fishing.RandomGenerator
                 }
             }
             return key;
+        }
+
+        public static List<T> SelectRandomItems<T>(Dictionary<T, float> items,int count)
+        {
+            float maxCatchValue = 0;
+            Dictionary<T, Vector2> catchValues = new();
+            foreach (var i in items)
+            {
+                catchValues.Add(i.Key, new Vector2(maxCatchValue, maxCatchValue + i.Value));
+                maxCatchValue += i.Value;
+            }
+            List<T> result = new();
+            for (int i = 0; i < count; i++)
+            {
+                float catchValue = Random.Range(0, maxCatchValue);
+                foreach (var catchItem in catchValues)
+                {
+                    if (catchItem.Value.x < catchValue && catchItem.Value.y >= catchValue)
+                    {
+                        result.Add(catchItem.Key);
+                        break;
+                    }
+                }
+            }
+            return result;
         }
     }
 }

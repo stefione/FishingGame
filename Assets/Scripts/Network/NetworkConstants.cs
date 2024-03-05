@@ -5,6 +5,6 @@ namespace PixPlays.Framework.Network
 {
     public static class NetworkConstants
     {
-        public static int MaxPayloadSize=4094;
+        public static int MaxPayloadSize= 512000;
     }
 }

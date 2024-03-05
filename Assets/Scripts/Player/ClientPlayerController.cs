@@ -1,100 +1,71 @@
-using PixPlays.Fishing.Entities;
+using PixPlays.Fishing.Animation;
+using PixPlays.Fishing.Fish;
 using PixPlays.Fishing.GameManagement;
-using PixPlays.Fishing.Hook;
-using PixPlays.Fishing.World;
+using PixPlays.Fishing.UI;
 using PixPlays.Framework.Events;
-using PixPlays.Framework.Network;
-using System;
-using System.Collections;
-using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
 namespace PixPlays.Fishing.Player
 {
-    public class TryCatchFishEvent
-    {
-        public ulong PlayerID;
-    }
-    public class PlayerControllerSpawnedEvent
-    {
-        public ClientPlayerController Controller;
-    }
-    public class ThrowHookEvent
-    {
-        public ulong PlayerID;
-    }
-
     public class ClientPlayerController : BasePlayerController
     {
-        private ulong _playerClientId;
-        public HookController Hook;
-        private BaseFishController _caughtFish;
-        private bool _canThrow=true;
+        [SerializeField] Transform _BoatTransform;
+        [SerializeField] Animator _Anim;
+        private AnimationEventsController _animEventsController;
         private void Awake()
         {
-            EventManager.Subscribe<LiftHookEvent>(x => ProcessLiftHookEvent(x));
+            EventManager.Subscribe<OnClientStartedEvent>(x => ProcessOnClientStartedEvent(x));
+            _animEventsController=_Anim.GetComponent<AnimationEventsController>();
+            _animEventsController.Subscribe("ThrowHook", ThrowHook);
         }
-
-        public override void OnNetworkSpawn()
+        private void Start()
         {
-            base.OnNetworkSpawn();
-            EventManager.Fire(new PlayerControllerSpawnedEvent()
+            if (transform.position.x > 0)
             {
-                Controller = this
+                Vector3 scale = _BoatTransform.localScale;
+                scale.x *= -1;
+                _BoatTransform.localScale = scale;
+            }
+            EventManager.Fire(new PlayerDataUpdated()
+            {
+                ClientId=Id,
+                playerData = _playerData
             });
         }
-        private void ProcessLiftHookEvent(LiftHookEvent x)
-        {
-            if (x.Owner == this) 
-            {
-                LiftHook(x.Fish);
-            }
-        }
 
-        public void SetData(ulong playerClientId ,PlayerData playerData, WaterArea waterArea)
+        private void ProcessOnClientStartedEvent(OnClientStartedEvent eventData)
         {
-            _playerClientId = playerClientId;
-            _playerData = playerData;
-            Hook.SetData(waterArea);
-            Hook.OnHookReachedMaxDepth += _hook_OnHookReachedMaxDepth;
-            Hook.OnHookLifted += _hook_OnHookLifted;
-        }
-
-        private void _hook_OnHookLifted()
-        {
-            if (_caughtFish != null)
-            {
-                _caughtFish.ResetFish();
-            }
-            _canThrow = true;
-        }
-
-        private void _hook_OnHookReachedMaxDepth()
-        {
-            EventManager.Fire(new TryCatchFishEvent()
-            {
-                PlayerID = _playerClientId
-            });
         }
 
         public void Update()
         {
-            if (IsOwner && _canThrow && Input.GetKeyDown(KeyCode.Space))
+            if (IsOwner && CanThrow && Input.GetKeyDown(KeyCode.Space))
             {
-                EventManager.Fire(new ThrowHookEvent() { PlayerID = OwnerClientId });
+                EventManager.Fire(new ThrowHookEvent() { PlayerID = Id });
             }
         }
 
-        public void ThrowHook()
+        public void StartThrowHook()
         {
-            Hook.ThrowHook();
-            _canThrow = false;
+            _Anim.SetTrigger("ThrowHook");
         }
 
-        internal void LiftHook(BaseFishController fish)
+        public override void LiftHook(BaseFishController fish)
         {
-            _caughtFish= fish;
-            Hook.LiftHook();
+            base.LiftHook(fish);
+            _Anim.SetBool("PullingHook",true);
         }
+
+        protected override void _hook_OnHookLifted()
+        {
+            base._hook_OnHookLifted();
+            _Anim.SetBool("PullingHook", false);
+            EventManager.Fire(new PlayerDataUpdated()
+            {
+                ClientId = Id,
+                playerData = _playerData
+            });
+        }
+
+
     }
 }

@@ -1,26 +1,23 @@
+using PixPlays.Fishing.Fish;
 using System.Collections;
 using System.Collections.Generic;
-using Unity.Netcode;
+using System.Linq;
 using UnityEngine;
 namespace PixPlays.Fishing.Player
 {
     [System.Serializable]
     public class PlayerData
     {
-        public string Id;
         public string Name;
-        public List<bool> Attempts=new();
+        public List<string> AttemptLog=new();
+        public List<bool> AttemptLogSuccesses = new();
         public Dictionary<string, int> FishCought=new();
 
-        public PlayerData(PlayerDataStruct data)
+        public PlayerData(PlayerDataMessage data)
         {
-            Id = data.Id;
             Name = data.Name;
-            Attempts = data.Attempts;
-            if (Attempts == null)
-            {
-                Attempts = new();
-            }
+            AttemptLogSuccesses = data.AttemptLogSuccesses.ToList();
+            AttemptLog = data.AttemptLog;
             FishCought = new();
             if (data.FishCought != null)
                 foreach (var i in data.FishCought)
@@ -28,52 +25,28 @@ namespace PixPlays.Fishing.Player
                     FishCought.Add(i.Id, i.Count);
                 }
         }
-    }
 
-
-    public struct FishCoughtData : INetworkSerializable
-    {
-        public string Id;
-        public int Count;
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+        public void UpdateAttempt(bool isSuccess,FishData fishData)
         {
-            serializer.SerializeValue(ref Id);
-            serializer.SerializeValue(ref Count);
-        }
-    }
-
-    public struct PlayerDataStruct : INetworkSerializable
-    {
-        public string Id;
-        public string Name;
-        public List<bool> Attempts;
-        public List<FishCoughtData> FishCought;
-
-        public PlayerDataStruct(PlayerData data)
-        {
-            Id = data.Id;
-            Name = data.Name;
-            Attempts = data.Attempts;
-            FishCought = new();
-            if (data.FishCought != null)
-                foreach (var i in data.FishCought)
+            if (isSuccess)
+            {
+                AttemptLogSuccesses.Add(true);
+                AttemptLog.Add(fishData.Name);
+                if (FishCought.ContainsKey(fishData.Id))
                 {
-                    FishCought.Add(new FishCoughtData()
-                    {
-                        Count = i.Value,
-                        Id = i.Key
-                    });
+                    FishCought[fishData.Id]++;
                 }
+                else
+                {
+                    FishCought.Add(fishData.Id, 1);
+                }
+            }
+            else
+            {
+                AttemptLogSuccesses.Add(false);
+                AttemptLog.Add("Missed");
+            }
 
         }
-
-        public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-        {
-            serializer.SerializeValue(ref Id);
-            serializer.SerializeValue(ref Name);
-            FishCought = NetworkController.SerializeList<FishCoughtData, T>(FishCought, serializer);
-        }
-
     }
 }

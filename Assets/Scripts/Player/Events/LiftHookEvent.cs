@@ -1,10 +1,10 @@
-﻿using PixPlays.Fishing.Player;
-
-namespace PixPlays.Fishing.Entities
+﻿
+namespace PixPlays.Fishing.Player
 {
     public class LiftHookEvent
     {
-        public ClientPlayerController Owner;
-        public FishController Fish;
+        public bool Success;
+        public ulong OwnerId;
+        public ulong FishId;
     }
 }

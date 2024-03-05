@@ -47,5 +47,10 @@ namespace PixPlays.Fishing.Movement
         {
             return _AncorObject.position;
         }
+
+        public override void SetForward(Vector3 forward)
+        {
+            _AncorObject.right = forward;
+        }
     }
 }
