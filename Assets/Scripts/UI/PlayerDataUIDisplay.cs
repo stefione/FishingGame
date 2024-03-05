@@ -39,11 +39,11 @@ namespace PixPlays.Fishing.UI
             _FishLogObject.gameObject.SetActive(!_FishLogObject.gameObject.activeInHierarchy);
             if (_FishLogObject.gameObject.activeInHierarchy)
             {
-                _LogButtonText.text = "Show Log";
+                _LogButtonText.text = "Hide Log";
             }
             else
             {
-                _LogButtonText.text = "Hide Log";
+                _LogButtonText.text = "Show Log";
             }
 
         }

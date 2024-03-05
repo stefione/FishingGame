@@ -52,7 +52,7 @@ MonoBehaviour:
   _meshFilter: {fileID: 4704277093749375887}
   _Distance: 2
   Height: 1.5
-  HorizontalSubdivision: 10
+  HorizontalSubdivision: 20
   VerticalSubdivision: 5
 --- !u!114 &4817081017874638726
 MonoBehaviour:

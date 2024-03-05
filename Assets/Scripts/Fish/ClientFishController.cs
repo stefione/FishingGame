@@ -1,19 +1,7 @@
-using PixPlays.Fishing.GameManagement;
-using PixPlays.Fishing.Movement;
-using PixPlays.Fishing.Player;
-using PixPlays.Fishing.States;
+
 using PixPlays.Fishing.World;
-using PixPlays.Framework.Events;
-using PixPlays.Framework.Network;
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.Cryptography.X509Certificates;
-using Unity.Collections;
-using Unity.Netcode;
 using UnityEngine;
-using static UnityEditor.PlayerSettings;
-using static UnityEngine.UI.GridLayoutGroup;
 
 namespace PixPlays.Fishing.Fish
 {
@@ -30,14 +18,20 @@ namespace PixPlays.Fishing.Fish
             _movementController = template.MovementController;
             _originalMovementSpeed = _movementController.MovementSpeed;
             _states.Add(FishStates.RandomMove, new RandomMoveState(this, _movementController, _waterArea));
-            _states.Add(FishStates.BiteHook, new BiteHookState(_movementController, this, OnBiteHookFinish));
-            _states.Add(FishStates.HookedState, new HookedState(this, _movementController));
+            _states.Add(FishStates.BiteHook, new BiteHookState(_movementController, this, OnBiteHookFinish, OnBiteHookCancel));
+            _states.Add(FishStates.HookedState, new HookedState(this, _movementController,OnBiteHookCancel));
             _states.Add(FishStates.OutOfWater, new OutOfWaterState(_movementController, _originalMovementSpeed, waterArea, OnReturnToWater));
             _states.Add(FishStates.SyncedMoveState, new SyncedMoveState(this, _movementController));
             _movementController.Teleport(startLocation);
 
             SetState(FishStates.SyncedMoveState);
         }
+
+        private void OnBiteHookCancel()
+        {
+            SetState(FishStates.SyncedMoveState);
+        }
+
         public void UpdatePosition(Vector3 pos)
         {
             TargetPos = pos;

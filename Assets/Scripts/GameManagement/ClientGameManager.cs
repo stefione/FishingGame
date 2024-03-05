@@ -1,21 +1,13 @@
-using PixPlays.Fishing.Configuration;
+
 using PixPlays.Fishing.Fish;
 using PixPlays.Fishing.Player;
-using PixPlays.Fishing.RandomGenerator;
 using PixPlays.Fishing.UI;
 using PixPlays.Fishing.World;
 using PixPlays.Framework.Events;
 using PixPlays.Framework.Network;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data.SqlTypes;
-using System.IO;
-using System.Linq;
-using System.Runtime.Serialization.Formatters.Binary;
 using Unity.Collections;
 using Unity.Netcode;
-using UnityEditor.MPE;
 using UnityEngine;
 namespace PixPlays.Fishing.GameManagement
 {
@@ -33,9 +25,45 @@ namespace PixPlays.Fishing.GameManagement
             EventManager.Subscribe<LiftHookEvent>(x => ProcessLiftHookEvent(x));
             NetworkManager.Singleton.OnClientStarted += NetworkManager_OnClientStarted;
             NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
+            NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectCallback;
             NetworkManager.Singleton.StartClient();
+            EventManager.Fire(new OpenLoadingScreenEvent()
+            {
+                Message = "Waiting for server"
+            });
         }
 
+        private void NetworkManager_OnClientDisconnectCallback(ulong obj)
+        {
+            string reason = NetworkManager.Singleton.DisconnectReason;
+            if (string.IsNullOrEmpty(reason))
+            {
+                reason = "Disconnected";
+            }
+            EventManager.Fire(new OpenPromptPanel()
+            {
+                ButtonText = "Try Again",
+                Callback = TryConnectAgain,
+                Message = reason
+            });
+            EventManager.Fire(new CloseLoadingScreenEvent());
+            foreach (var i in PlayerDatas)
+            {
+                EventManager.Fire(new PlayerDisconnectedEvent()
+                {
+                    ClientId = i.Key
+                });
+            }
+            Cleanup();
+        }
+        private void TryConnectAgain()
+        {
+            NetworkManager.Singleton.StartClient();
+            EventManager.Fire(new OpenLoadingScreenEvent()
+            {
+                Message = "Waiting for server"
+            });
+        }
         private void NetworkManager_OnClientStarted()
         {
             NetworkManager.Singleton.CustomMessagingManager?.RegisterNamedMessageHandler(
@@ -154,6 +182,7 @@ namespace PixPlays.Fishing.GameManagement
         private void ProcessPlayerRegisteredMessage(ulong clientId, Vector3 position, PlayerData playerData,int spawnPointIndex)
         {
             RegisterPlayer(clientId, position, playerData, spawnPointIndex);
+            EventManager.Fire(new CloseLoadingScreenEvent());
         }
 
 
@@ -242,6 +271,20 @@ namespace PixPlays.Fishing.GameManagement
                     writer,
                     NetworkDelivery.ReliableFragmentedSequenced);
             }
+        }
+        private void Cleanup()
+        {
+            foreach(var i in PlayerControllers)
+            {
+                Destroy(i.Value.gameObject);
+            }
+            foreach(var i in spawnedFish)
+            {
+                Destroy(i.Value.gameObject);
+            }
+            spawnedFish.Clear();
+            PlayerControllers.Clear();
+            PlayerDatas.Clear();
         }
     }
 }

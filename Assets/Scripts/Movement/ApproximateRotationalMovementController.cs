@@ -11,6 +11,10 @@ namespace PixPlays.Fishing.Movement
 
         public override void Teleport(Vector3 location)
         {
+            if (_AncorObject == null)
+            {
+                return;
+            }
             Vector3 previousLocation = _AncorObject.position;
             _AncorObject.position = location;
             _AncorObject.right=(_AncorObject.position- previousLocation).normalized;
@@ -40,16 +44,28 @@ namespace PixPlays.Fishing.Movement
         }
         public override Vector3 GetForward()
         {
+            if (_AncorObject == null)
+            {
+                return Vector3.zero;
+            }
             return _AncorObject.right;
         }
 
         public override Vector3 GetPosition()
         {
+            if (_AncorObject == null)
+            {
+                return Vector3.zero;
+            }
             return _AncorObject.position;
         }
 
         public override void SetForward(Vector3 forward)
         {
+            if (_AncorObject == null)
+            {
+                return;
+            }
             _AncorObject.right = forward;
         }
     }

@@ -2,6 +2,7 @@ using PixPlays.Fishing.Movement;
 using PixPlays.Fishing.Player;
 using PixPlays.Fishing.States;
 using PixPlays.Fishing.World;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
@@ -22,13 +23,17 @@ namespace PixPlays.Fishing.Fish
             _movementController = GetComponent<MovementController>();
             _originalMovementSpeed = _movementController.MovementSpeed;
             _states.Add(FishStates.RandomMove, new RandomMoveState(this, _movementController, _waterArea));
-            _states.Add(FishStates.BiteHook, new BiteHookState(_movementController, this, OnBiteHookFinish));
-            _states.Add(FishStates.HookedState, new HookedState(this, _movementController));
+            _states.Add(FishStates.BiteHook, new BiteHookState(_movementController, this, OnBiteHookFinish,OnBiteHookCancel));
+            _states.Add(FishStates.HookedState, new HookedState(this, _movementController, OnBiteHookCancel));
             _states.Add(FishStates.OutOfWater, new OutOfWaterState(_movementController, _originalMovementSpeed, waterArea, OnReturnToWater));
             _movementController.Teleport(startLocation);
             SetState(FishStates.RandomMove);
         }
 
+        private void OnBiteHookCancel()
+        {
+            SetState(FishStates.RandomMove);
+        }
 
         private void Update()
         {

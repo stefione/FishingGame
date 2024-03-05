@@ -5,6 +5,8 @@ namespace PixPlays.Framework.Network
 {
     public static class NetworkConstants
     {
-        public static int MaxPayloadSize= 512000;
+        public const int MaxPayloadSize= 512000;
+        public const string ServerScene = "ServerWorld";
+        public const string ClientScene = "GameWorld";
     }
 }

@@ -24,7 +24,6 @@ namespace PixPlays.Fishing.Fish
         private void Start()
         {
             Initialize();
-            _points = new NativeArray<Vector3>(_points.ToArray(), Allocator.Persistent);
             _verticies = new NativeArray<Vector3>(mesh.vertices, Allocator.Persistent);
         }
 

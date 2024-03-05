@@ -1,6 +1,7 @@
 using PixPlays.Fishing.Fish;
 using PixPlays.Fishing.Movement;
 using PixPlays.Fishing.States;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,8 +12,10 @@ namespace PixPlays.Fishing.Fish
         private BaseFishController _fishController;
         private MovementController _movementController;
         private float _lerp = 0;
-        public HookedState(BaseFishController fishController, MovementController movementController)
+        private Action _onCancel;
+        public HookedState(BaseFishController fishController, MovementController movementController,Action onCancel)
         {
+            _onCancel = onCancel;
             _fishController = fishController;
             _movementController = movementController;
         }
@@ -31,6 +34,8 @@ namespace PixPlays.Fishing.Fish
             if (_fishController.PlayerOwner == null)
             {
                 Debug.LogError("Bitten hook is null");
+                _onCancel?.Invoke();
+                Deactivate();
                 return;
             }
             if (_fishController.PlayerOwner.Hook.HookPosition != _movementController.GetPosition())

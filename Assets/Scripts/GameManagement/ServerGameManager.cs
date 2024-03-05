@@ -30,6 +30,7 @@ namespace PixPlays.Fishing.GameManagement
 
         private void Awake()
         {
+            Application.targetFrameRate = 30;
         }
 
         private void Start()
@@ -39,9 +40,22 @@ namespace PixPlays.Fishing.GameManagement
             NetworkManager.Singleton.OnServerStarted += NetworkManager_OnServerStarted;
             NetworkManager.Singleton.OnClientConnectedCallback += NetworkManager_OnClientConnectedCallback;
             NetworkManager.Singleton.OnClientDisconnectCallback += NetworkManager_OnClientDisconnectedCallback;
+            NetworkManager.Singleton.ConnectionApprovalCallback += NetworkManager_OnConnectionApprovalCallback;
             NetworkManager.Singleton.StartServer();
         }
 
+        private void NetworkManager_OnConnectionApprovalCallback(NetworkManager.ConnectionApprovalRequest request, NetworkManager.ConnectionApprovalResponse response)
+        {
+            if (PlayerDatas.Count == 2)
+            {
+                response.Approved = false;
+                response.Reason = "Server is full";
+            }
+            else
+            {
+                response.Approved = true;
+            }
+        }
         private void NetworkManager_OnClientDisconnectedCallback(ulong obj)
         {
             if(PlayerControllers.TryGetValue(obj, out var playerController))
@@ -293,6 +307,10 @@ namespace PixPlays.Fishing.GameManagement
         }
         private void SendClientDisconnectedMessage(ulong clientId)
         {
+            if (NetworkManager.Singleton == null)
+            {
+                return;
+            }
             using (FastBufferWriter writer = new FastBufferWriter(NetworkConstants.MaxPayloadSize, Allocator.Temp))
             {
                 writer.WriteValueSafe(clientId);

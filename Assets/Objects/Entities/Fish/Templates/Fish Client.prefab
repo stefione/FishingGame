@@ -9,8 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7425082196528319608}
-  - component: {fileID: 853060427832843959}
-  - component: {fileID: 4817081017874638726}
   - component: {fileID: 5721090978579213412}
   m_Layer: 0
   m_Name: Fish Client
@@ -36,40 +34,6 @@ Transform:
   - {fileID: 3075080170600943780}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &853060427832843959
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3383524476318285845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ec08a5f4b7bb90641b63a4561c990f29, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _Ancor: {fileID: 8896046392739061296}
-  _meshFilter: {fileID: 4704277093749375887}
-  _Distance: 2
-  Height: 1.5
-  HorizontalSubdivision: 10
-  VerticalSubdivision: 5
---- !u!114 &4817081017874638726
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3383524476318285845}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe7845e6ac11bf5409dac0f9883a1120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MovementSpeed: 3
-  RotationSpeed: 0.02
-  _AncorObject: {fileID: 8896046392739061296}
-  _ErrorDistance: 0.5
 --- !u!114 &5721090978579213412
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -82,9 +46,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a288ac807d5de244bdc823f9e3eca68, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _CurrentState: 0
   PlayerOwner: {fileID: 0}
-  SyncLerpSpeed: 10
+  FishData:
+    Id: 
+    Name: 
+    Rarity: 0
+    CatchChance: 0
+    SpawnChance: 0
+  SyncLerpSpeed: 5
 --- !u!1 &5924044190694411482
 GameObject:
   m_ObjectHideFlags: 0

@@ -25,7 +25,7 @@ namespace PixPlays.Fishing.Player
                 scale.x *= -1;
                 _BoatTransform.localScale = scale;
             }
-            EventManager.Fire(new PlayerDataUpdated()
+            EventManager.Fire(new PlayerDataUpdatedEvent()
             {
                 ClientId=Id,
                 playerData = _playerData
@@ -59,7 +59,7 @@ namespace PixPlays.Fishing.Player
         {
             base._hook_OnHookLifted();
             _Anim.SetBool("PullingHook", false);
-            EventManager.Fire(new PlayerDataUpdated()
+            EventManager.Fire(new PlayerDataUpdatedEvent()
             {
                 ClientId = Id,
                 playerData = _playerData

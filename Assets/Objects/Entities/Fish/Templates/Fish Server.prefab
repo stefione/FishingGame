@@ -47,9 +47,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   MovementSpeed: 3
-  RotationSpeed: 0.02
+  RotationSpeed: 0.035
   _AncorObject: {fileID: 8896046392739061296}
-  _ErrorDistance: 0.5
+  _ErrorDistance: 1
 --- !u!114 &8193298125582994583
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -63,6 +63,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   PlayerOwner: {fileID: 0}
+  FishData:
+    Id: 
+    Name: 
+    Rarity: 0
+    CatchChance: 0
+    SpawnChance: 0
 --- !u!1 &5924044190694411482
 GameObject:
   m_ObjectHideFlags: 0

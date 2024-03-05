@@ -1,21 +1,10 @@
-using Assets.HeroEditor.Common.Scripts.Common;
 using PixPlays.Fishing.GameManagement;
-using PixPlays.Fishing.Player;
 using PixPlays.Framework.Events;
-using System;
-using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace PixPlays.Fishing.UI
 {
-    public class PlayerDataUpdated
-    {
-        public ulong ClientId;
-        public PlayerData playerData;
-    }
 
     public class UIController : MonoBehaviour
     {
@@ -28,7 +17,7 @@ namespace PixPlays.Fishing.UI
             {
                 i.gameObject.SetActive(false);
             }
-            EventManager.Subscribe<PlayerDataUpdated>(x => ProcessPlayerDataUpdated(x));
+            EventManager.Subscribe<PlayerDataUpdatedEvent>(x => ProcessPlayerDataUpdated(x));
             EventManager.Subscribe<PlayerRegisteredEvent>(x => ProcessPlayerRegisteredEvent(x));
             EventManager.Subscribe<PlayerDisconnectedEvent>(x => ProcessPlayerDisconnectedEvent(x));
         }
@@ -55,7 +44,7 @@ namespace PixPlays.Fishing.UI
             display.UpdateData(x.PlayerData);
         }
 
-        private void ProcessPlayerDataUpdated(PlayerDataUpdated x)
+        private void ProcessPlayerDataUpdated(PlayerDataUpdatedEvent x)
         {
             if(_displays.TryGetValue(x.ClientId,out var display))
             {

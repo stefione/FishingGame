@@ -12,13 +12,15 @@ namespace PixPlays.Fishing.Fish
         private MovementController _movementController;
         private BaseFishController _fishController;
         private Action _onFinish;
+        private Action _onCancel;
         private bool _hookBitten;
-        public BiteHookState(MovementController movementController, BaseFishController fishController,Action onFinish)
+        public BiteHookState(MovementController movementController, BaseFishController fishController,Action onFinish,Action onCancel)
         {
             _hookBitten = false;
             _fishController = fishController;
             _movementController = movementController;
             _onFinish= onFinish;
+            _onCancel=onCancel;
         }
 
         private void _movementController_OnDestinationReached(Vector3 arg1, Vector3 arg2)
@@ -45,6 +47,8 @@ namespace PixPlays.Fishing.Fish
                 if (_fishController.PlayerOwner == null)
                 {
                     Debug.LogError("Bitten hook is null");
+                    _onCancel?.Invoke();
+                    Deactivate();
                     return;
                 }
                 _movementController.MoveTo(_fishController.PlayerOwner.Hook.HookPosition);
